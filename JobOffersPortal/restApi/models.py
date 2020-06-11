@@ -1,19 +1,24 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractUser
+from restApi.managers.userManager import UserManager
 
-class Password(models.Model):
-    password_id = models.AutoField(primary_key = True)
-    password = models.CharField(max_length = 255, blank=False)
-
-class User(models.Model):
+class User(AbstractUser):
+    username = None
     user_id = models.AutoField(primary_key=True)
-    password_id = models.ForeignKey(Password, on_delete = models.CASCADE)
     name = models.CharField(max_length = 45, blank = False, default = '')
     surname = models.CharField(max_length = 45, blank = False, default = '')
-    mail = models.CharField(max_length = 45, blank = False, default = '')
+    email = models.CharField(max_length = 45, blank = False, default = '')
     phone_regex = RegexValidator(regex = r'^\+?1?\d{9,15}$',
                                  message = "Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators = [phone_regex], max_length = 17, blank=True)
+    isEmployer = models.BooleanField(default=False)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = UserManager()
+
+    def __str__(self):
+        return self.email
 
 class CV(models.Model):
     cv_id = models.AutoField(primary_key=True)
@@ -41,13 +46,6 @@ class JobAdvertisement(models.Model):
     description = models.CharField(max_length = 2000, blank = True, default = '')
     expiration_date = models.DateTimeField('expiration date')
     salary = models.FloatField(blank = False)
-
-class Token(models.Model):
-    token_id = models.AutoField(primary_key = True)
-    token = models.CharField(max_length = 255)
-
-
-
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key=True)
