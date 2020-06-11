@@ -1,3 +1,6 @@
-from django.shortcuts import render
+from .models import User
+from rest_auth.registration.views import RegisterView
 
-# Create your views here.
+class CustomRegisterView(RegisterView):
+    queryset = User.objects.all()
+    
