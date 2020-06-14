@@ -48,3 +48,13 @@ class JobOffersViewSet(viewsets.ViewSet):
                 serializer.save()
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk = None):
+        try:
+            JobOffer.objects.get(pk = pk).delete()
+            return Response(request.data, status = status.HTTP)
+        except JobOffer.DoesNotExist:
+            content = {
+                'status' : 'Resource does not exist'
+            }
+            return Response(content, status = status.HTTP_404_NOT_FOUND)
