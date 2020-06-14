@@ -1,44 +1,50 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
-from .serializers import JobAdvertisementSerializer, TagsSerializer
-from .models import User, JobAdvertisement, Tag
+from .serializers import JobOfferSerializer, TagsSerializer
+from .models import User, JobOffer, JobTag
+from .permissions import IsEmployer, IsOwner
 
 class CustomRegisterView(RegisterView):
     queryset = User.objects.all()
 
-class TagsList(APIView):
-    serializer_class = TagsSerializer
-    permission_classes = (IsAuthenticated,)
-    def get(self, request, format=None):
+class JobOffersViewSet(viewsets.ViewSet):
+    serializer_class = JobOfferSerializer
+    permission_classes = [IsEmployer&IsOwner]
 
-        tags = Tag.objects.all()
-        serializer = TagsSerializer(tags, many = True)
+    def list(self, request):
+        jobs = JobOffer.objects.all()
+        serializer = JobOfferSerializer(jobs, many = True)
         return Response(serializer.data)
 
-    def post(self, request, format = None):
-        serializer = TagsSerializer(data = request.data)
+    def create(self, request):
+        serializer = JobOfferSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-
-class JobAvertisementList(APIView):
-    serializer_class = JobAdvertisementSerializer
-    permission_classes = (IsAuthenticated,)
-    def get(self, request, format = None):
-        jobs = JobAdvertisement.objects.all()
-        serializer = JobAdvertisementSerializer(jobs, many = True)
+    def retrieve(self, request, pk = None):
+        queryset = JobOffer.objects.all()
+        jobOffer = get_object_or_404(queryset, pk = pk)
+        serializer = JobOfferSerializer(jobOffer)
         return Response(serializer.data)
 
-    def post(self, request, format = None):
-        serializer = JobAdvertisementSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
-        Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
+    def update(self, request, pk = None):
+        try:
+            instance = JobOffer.objects.get(pk = pk)
+            self.check_object_permissions(request, instance)
+            serializer = JobOfferSerializer(instance = instance, data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_200_OK)
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        except JobOffer.DoesNotExist:
+            serializer = JobOfferSerializer(data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)

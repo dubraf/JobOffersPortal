@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from restApi.models import User, Tag, JobAdvertisement
+from restApi.models import User, JobTag, JobOffer, EmployerProfile
 from rest_auth.registration.serializers import  RegisterSerializer
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -24,15 +24,21 @@ class CustomRegisterSerializer(RegisterSerializer):
 class CustomUserDetailsSerialier(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name', 'surname', 'email', 'phone_number', 'isEmployer']
+        fields = ['user_id', 'name', 'surname', 'email', 'phone_number', 'isEmployer']
         read_only_fields = ('email',)
 
 class TagsSerializer(serializers.ModelSerializer):
    class Meta:
-        model = Tag
+        model = JobTag
         fields = ['tag_id', 'name']
 
-class JobAdvertisementSerializer(serializers.HyperlinkedModelSerializer):
+class EmployerProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = JobAdvertisement
-        fields = ['tags', 'name', 'profile_id', 'description']
+        model: EmployerProfile
+
+class JobOfferSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(read_only = True, many = True)
+    #employerProfile = EmployerProfileSerializer(read_only = True, many = True)
+    class Meta:
+        model = JobOffer
+        fields = ['job_adv_id', 'user_id', 'tags', 'name', 'description', 'expiration_date', 'salary']
