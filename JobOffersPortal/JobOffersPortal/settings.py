@@ -61,14 +61,16 @@ SILENCED_SYSTEM_CHECKS = ['auth.E003', 'auth.W004']
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
 REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "restApi.serializers.CustomUserDetailsSerialier",
+    'USER_DETAILS_SERIALIZER': 'restApi.serializers.CustomUserDetailsSerialier',
 }
 REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "restApi.serializers.CustomRegisterSerializer",
+    'REGISTER_SERIALIZER': 'restApi.serializers.CustomRegisterSerializer',
 }
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'restApi.permissions.IsEmployer',
+        'restApi.permissions.IsOwner',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
