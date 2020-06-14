@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'jobOffers', views.JobOffersViewSet, basename = 'JobOffers')
+router.register(r'jobTags', views.JobTagsViewSet, basename = 'JobTags')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
