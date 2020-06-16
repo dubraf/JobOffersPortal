@@ -1,6 +1,27 @@
 from rest_framework import serializers
 from restApi.models import User, JobTag, JobOffer, EmployerProfile
 from rest_auth.registration.serializers import RegisterSerializer
+from allauth.account.adapter import DefaultAccountAdapter
+
+class UserAdapter(DefaultAccountAdapter):
+    def save_user(self, request, user, form, commit=True):
+        data = form.cleaned_data
+        email = data.get('email')
+        name = data.get('name')
+        surname = data.get('surname')
+        phone_number = data.get('phone_number')
+        isEmployer = data.get('isEmployer')
+        if email:
+            setattr(user, 'email', email)
+        if name:
+            setattr(user, 'name', name)
+        if surname:
+            setattr(user, 'surname', surname)
+        if phone_number:
+            setattr(user, 'phone_number', phone_number)
+        if isEmployer:
+            setattr(user, 'isEmployer', isEmployer)
+        return super().save_user(request, user, form, commit = commit)
 
 class CustomRegisterSerializer(RegisterSerializer):
     email = serializers.EmailField(required = True)
@@ -19,7 +40,13 @@ class CustomRegisterSerializer(RegisterSerializer):
             'email': self.validated_data.get('email', ''),
             'phone_number': self.validated_data.get('phone_number', ''),
             'isEmployer': self.validated_data.get('isEmployer', 'false')
-            }
+        }
+
+    def save(self, request):
+        user = super().save(request)
+        user.save()
+        return user
+
 
 class CustomUserDetailsSerialier(serializers.ModelSerializer):
     class Meta:
@@ -27,18 +54,21 @@ class CustomUserDetailsSerialier(serializers.ModelSerializer):
         fields = ['user_id', 'name', 'surname', 'email', 'phone_number', 'isEmployer']
         read_only_fields = ('email',)
 
+
 class JobTagsSerializer(serializers.ModelSerializer):
-   class Meta:
+    class Meta:
         model = JobTag
         fields = ['tag_id', 'name']
 
+
 class EmployerProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model: EmployerProfile
+        model = EmployerProfile
+        fields = ['profile_id', 'user_id', 'name', 'description', 'phone_number', 'email', 'address', 'website']
+
 
 class JobOfferSerializer(serializers.ModelSerializer):
-    tags = JobTagsSerializer(read_only = True, many = True)
-    #employerProfile = EmployerProfileSerializer(read_only = True, many = True)
+    jobTags = JobTagsSerializer(many = True, read_only = True)
     class Meta:
         model = JobOffer
-        fields = ['job_adv_id', 'user_id', 'tags', 'name', 'description', 'expiration_date', 'salary']
+        fields = ['employer_profile_id', 'job_adv_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']

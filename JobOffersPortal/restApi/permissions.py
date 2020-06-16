@@ -8,17 +8,17 @@ class IsEmployer(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
-        return request.user.is_authenticated
+        return request.user.is_authenticated and request.user.isEmployer
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
             return True
-        return request.user.isEmployer
+        return request.user.is_authenticated and request.user.isEmployer
 
 class IsOwner(permissions.BasePermission):
     message = 'Only owner can modify this content'
 
-    def has_object_permission(self, request, view, obj) :
-        if request.method in permissions.SAFE_METHODS :
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS or request.method == 'POST':
             return True
-        return request.user.user_id == obj.user_id
+        return request.user.email == obj.user_id.email
