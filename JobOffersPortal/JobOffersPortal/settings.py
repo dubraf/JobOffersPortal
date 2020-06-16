@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_auth',
 ]
 AUTH_USER_MODEL = 'restApi.User'
+ACCOUNT_ADAPTER = 'restApi.serializers.UserAdapter'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True

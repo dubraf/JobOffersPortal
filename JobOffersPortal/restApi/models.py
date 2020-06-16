@@ -25,10 +25,6 @@ class CV(models.Model):
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
     file = models.FileField()
 
-class JobTag(models.Model):
-    tag_id = models.AutoField(primary_key = True)
-    name = models.CharField(max_length = 45, blank = False)
-
 class EmployerProfile(models.Model):
     profile_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
@@ -43,11 +39,15 @@ class JobOffer(models.Model):
     job_adv_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
     employer_profile_id = models.ForeignKey(EmployerProfile, on_delete = models.PROTECT, null = True, blank = True)
-    tags = models.ManyToManyField(JobTag)
     name = models.CharField(max_length = 45, blank = False)
     description = models.CharField(max_length = 2000, blank = True, default = '')
     expiration_date = models.DateTimeField('expiration date')
     salary = models.FloatField(blank = False)
+
+class JobTag(models.Model):
+    tag_id = models.AutoField(primary_key = True)
+    jobOffer = models.ForeignKey(JobOffer, on_delete = models.PROTECT, related_name = 'jobTags', null = True)
+    name = models.CharField(max_length = 45, blank = False)
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key = True)

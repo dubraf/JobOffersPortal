@@ -1,11 +1,11 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_auth.registration.views import RegisterView
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from django.shortcuts import get_object_or_404
 
-from .serializers import JobOfferSerializer, JobTagsSerializer
-from .models import User, JobOffer, JobTag
+from .serializers import JobOfferSerializer, JobTagsSerializer, EmployerProfileSerializer
+from .models import User, JobOffer, JobTag, EmployerProfile
 from .permissions import IsEmployer, IsOwner
 
 class CustomRegisterView(RegisterView):
@@ -106,3 +106,13 @@ class JobTagsViewSet(viewsets.ViewSet):
                 'status': 'Resource does not exist'
             }
             return Response(content, status = status.HTTP_404_NOT_FOUND)
+
+class EmployerProfileViewSet(mixins.CreateModelMixin,
+                             mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.DestroyModelMixin,
+                             viewsets.GenericViewSet):
+    queryset = EmployerProfile.objects.all()
+    serializer_class = EmployerProfileSerializer
+    permission_classes = [IsEmployer, IsOwner]
