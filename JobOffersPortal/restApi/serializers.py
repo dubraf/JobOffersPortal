@@ -68,7 +68,19 @@ class EmployerProfileSerializer(serializers.ModelSerializer):
 
 
 class JobOfferSerializer(serializers.ModelSerializer):
-    jobTags = JobTagsSerializer(many = True, read_only = True)
+    jobTags = JobTagsSerializer(many = True)
     class Meta:
         model = JobOffer
         fields = ['employer_profile_id', 'job_adv_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']
+
+    def create(self, validated_data):
+        jobTagsData = validated_data.pop('jobTags')
+        jobOffer = JobOffer.objects.create(**validated_data)
+        for jobTag in jobTagsData:
+            try:
+                jobTag = JobTag.objects.get(name = jobTag['name'])
+                jobOffer.jobTags.add(jobTag)
+            except JobTag.DoesNotExist:
+                raise serializers.ValidationError({"detail": "Tag with given name doesn't exist"})
+        return jobOffer
+

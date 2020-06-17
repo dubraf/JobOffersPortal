@@ -70,6 +70,11 @@ class JobTagsViewSet(viewsets.ViewSet):
 
     def create(self, request):
         serializer = JobTagsSerializer(data = request.data)
+        if JobTag.objects.filter(name = request.data.get('name')).exists():
+            content = {
+                'status': 'Given tag already exists'
+            }
+            return Response(content, status = status.HTTP_302_FOUND)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
