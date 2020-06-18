@@ -4,9 +4,9 @@ from rest_auth.registration.views import RegisterView
 from rest_framework import viewsets, mixins
 from django.shortcuts import get_object_or_404
 
-from .serializers import JobOfferSerializer, JobTagsSerializer, EmployerProfileSerializer
-from .models import User, JobOffer, JobTag, EmployerProfile
-from .permissions import IsEmployer, IsOwner
+from .serializers import JobOfferSerializer, JobTagsSerializer, EmployerProfileSerializer, FavoriteJobOfferSerializer
+from .models import User, JobOffer, JobTag, EmployerProfile, FavoriteJobOffer
+from .permissions import IsEmployer, IsOwner, IsStandardUser
 
 class CustomRegisterView(RegisterView):
     queryset = User.objects.all()
@@ -121,3 +121,13 @@ class EmployerProfileViewSet(mixins.CreateModelMixin,
     queryset = EmployerProfile.objects.all()
     serializer_class = EmployerProfileSerializer
     permission_classes = [IsEmployer, IsOwner]
+
+class FavoriteJobOffersViewSet(mixins.CreateModelMixin,
+                               mixins.ListModelMixin,
+                               mixins.RetrieveModelMixin,
+                               mixins.UpdateModelMixin,
+                               mixins.DestroyModelMixin,
+                               viewsets.GenericViewSet):
+    queryset = FavoriteJobOffer.objects.all()
+    serializer_class = FavoriteJobOfferSerializer
+    permission_classes = [IsStandardUser, IsOwner]

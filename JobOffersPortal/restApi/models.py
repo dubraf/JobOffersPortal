@@ -40,7 +40,7 @@ class JobTag(models.Model):
     name = models.CharField(max_length = 45, blank = False)
 
 class JobOffer(models.Model):
-    job_adv_id = models.AutoField(primary_key = True)
+    job_offer_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
     employer_profile_id = models.ForeignKey(EmployerProfile, on_delete = models.PROTECT, null = True, blank = True)
     name = models.CharField(max_length = 45, blank = False)
@@ -51,3 +51,8 @@ class JobOffer(models.Model):
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key = True)
+
+class FavoriteJobOffer(models.Model):
+    fav_job_offer_id = models.AutoField(primary_key = True)
+    user_id = models.ForeignKey(User, on_delete = models.PROTECT)
+    job_offers = models.ManyToManyField(JobOffer)
