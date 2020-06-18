@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_auth',
 ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
 AUTH_USER_MODEL = 'restApi.User'
 ACCOUNT_ADAPTER = 'restApi.serializers.UserAdapter'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None

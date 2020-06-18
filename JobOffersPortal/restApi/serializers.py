@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from restApi.models import User, JobTag, JobOffer, EmployerProfile, FavoriteJobOffer
+from rest_framework.parsers import MultiPartParser
+
+from restApi.models import User, JobTag, JobOffer, EmployerProfile, FavoriteJobOffer, CV
 from rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.adapter import DefaultAccountAdapter
 
@@ -107,3 +109,9 @@ class FavoriteJobOfferSerializer(serializers.ModelSerializer):
             except JobOffer.DoesNotExist:
                 raise serializers.ValidationError({"detail": "Job offer with given id doesn't exist"})
         return favorite_job_offer
+
+
+class CVSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CV
+        fields = '__all__'
