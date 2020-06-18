@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'jobOffers', views.JobOffersViewSet, basename = 'JobOffers')
 router.register(r'jobTags', views.JobTagsViewSet, basename = 'JobTags')
-router.register(r'employerProfile', views.EmployerProfileViewSet, basename = 'EmployerProfile')
-router.register(r'favOffers/favorite', views.FavoriteJobOffersViewSet, basename = 'FavoriteOffers')
+router.register(r'employerProfiles', views.EmployerProfileViewSet, basename = 'EmployerProfiles')
+router.register(r'favOffers', views.FavoriteJobOffersViewSet, basename = 'FavoriteOffers')
 router.register(r'cv', views.CVViewSet, basename = 'CV')
 
 urlpatterns = [
