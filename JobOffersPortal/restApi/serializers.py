@@ -26,13 +26,11 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.save()
         return user
 
-
 class CustomUserDetailsSerialier(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['user_id', 'name', 'surname', 'email', 'phone_number', 'isEmployer']
         read_only_fields = ('email',)
-
 
 class JobTagsSerializer(serializers.ModelSerializer):
     user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
@@ -40,20 +38,20 @@ class JobTagsSerializer(serializers.ModelSerializer):
         model = JobTag
         fields = ['tag_id', 'user_id', 'name']
 
-
 class EmployerProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = EmployerProfile
-        fields = ['profile_id', 'user_id', 'name', 'description', 'phone_number', 'email', 'address', 'website']
-
+        fields = ['profile_id', 'user_id', 'name', 'description',
+                  'phone_number', 'email', 'address', 'website', 'image']
 
 class JobOfferSerializer(serializers.ModelSerializer):
     jobTags = JobTagsSerializer(many = True)
     user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = JobOffer
-        fields = ['employer_profile_id', 'job_offer_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']
+        fields = ['employer_profile_id', 'job_offer_id', 'user_id', 'jobTags',
+                  'name', 'description', 'expiration_date', 'salary', 'image']
 
     def create(self, validated_data):
         job_tags_data = validated_data.pop('jobTags')
@@ -65,7 +63,6 @@ class JobOfferSerializer(serializers.ModelSerializer):
             except JobTag.DoesNotExist:
                 raise serializers.ValidationError({"detail": "Tag with given name doesn't exist"})
         return job_offer
-
 
 class FavoriteJobOfferSerializer(serializers.ModelSerializer):
     job_offers = serializers.PrimaryKeyRelatedField(many = True, queryset = JobOffer.objects.all())

@@ -40,6 +40,7 @@ class EmployerProfileViewSet(mixins.CreateModelMixin,
                              mixins.DestroyModelMixin,
                              viewsets.GenericViewSet):
     queryset = EmployerProfile.objects.all()
+    parser_classes = (MultiPartParser,)
     serializer_class = EmployerProfileSerializer
     permission_classes = [IsEmployer, IsOwner]
 

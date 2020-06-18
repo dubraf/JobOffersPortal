@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from .validators import validate_image_file_extension
 from django.contrib.auth.models import AbstractUser
 from restApi.managers.userManager import UserManager
 
@@ -23,17 +24,18 @@ class User(AbstractUser):
 class CV(models.Model):
     cv_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
-    file = models.FileField(upload_to='message/%Y/%m/%d/')
+    file = models.FileField(upload_to='cvs/%Y/%m/%d/')
 
 class EmployerProfile(models.Model):
     profile_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
-    name = models.CharField(max_length = 45, blank = False, default = '')
-    description = models.CharField(max_length = 2000, blank = True, default = '')
+    name = models.CharField(max_length = 45, blank = False)
+    description = models.CharField(max_length = 2000, blank = True)
     phone_number = models.CharField(validators = [phone_regex], max_length = 17, blank = True)
-    email = models.EmailField(max_length = 45, blank = False, default = '')
-    address = models.CharField(max_length = 125, blank = False, default = '')
+    email = models.EmailField(max_length = 45, blank = False)
+    address = models.CharField(max_length = 125, blank = False)
     website = models.URLField(blank = True)
+    image = models.FileField(upload_to = 'photos', validators = [validate_image_file_extension], null = True)
 
 class JobTag(models.Model):
     tag_id = models.AutoField(primary_key = True)
@@ -49,6 +51,7 @@ class JobOffer(models.Model):
     expiration_date = models.DateTimeField('expiration date')
     salary = models.FloatField(blank = False)
     jobTags = models.ManyToManyField(JobTag)
+    image = models.FileField(upload_to = 'photos', validators = [validate_image_file_extension], null = True)
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key = True)
