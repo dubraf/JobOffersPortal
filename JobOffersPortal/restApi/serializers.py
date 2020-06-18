@@ -1,29 +1,6 @@
 from rest_framework import serializers
-from rest_framework.parsers import MultiPartParser
-
 from restApi.models import User, JobTag, JobOffer, EmployerProfile, FavoriteJobOffer, CV
 from rest_auth.registration.serializers import RegisterSerializer
-from allauth.account.adapter import DefaultAccountAdapter
-
-class UserAdapter(DefaultAccountAdapter):
-    def save_user(self, request, user, form, commit=True):
-        data = form.cleaned_data
-        email = data.get('email')
-        name = data.get('name')
-        surname = data.get('surname')
-        phone_number = data.get('phone_number')
-        isEmployer = data.get('isEmployer')
-        if email:
-            setattr(user, 'email', email)
-        if name:
-            setattr(user, 'name', name)
-        if surname:
-            setattr(user, 'surname', surname)
-        if phone_number:
-            setattr(user, 'phone_number', phone_number)
-        if isEmployer:
-            setattr(user, 'isEmployer', isEmployer)
-        return super().save_user(request, user, form, commit = commit)
 
 class CustomRegisterSerializer(RegisterSerializer):
     email = serializers.EmailField(required = True)
@@ -58,12 +35,14 @@ class CustomUserDetailsSerialier(serializers.ModelSerializer):
 
 
 class JobTagsSerializer(serializers.ModelSerializer):
+    user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = JobTag
-        fields = ['tag_id', 'name']
+        fields = ['tag_id', 'user_id', 'name']
 
 
 class EmployerProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = EmployerProfile
         fields = ['profile_id', 'user_id', 'name', 'description', 'phone_number', 'email', 'address', 'website']
@@ -71,25 +50,26 @@ class EmployerProfileSerializer(serializers.ModelSerializer):
 
 class JobOfferSerializer(serializers.ModelSerializer):
     jobTags = JobTagsSerializer(many = True)
+    user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = JobOffer
         fields = ['employer_profile_id', 'job_offer_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']
 
     def create(self, validated_data):
-        jobTagsData = validated_data.pop('jobTags')
-        jobOffer = JobOffer.objects.create(**validated_data)
-        for jobTag in jobTagsData:
+        job_tags_data = validated_data.pop('jobTags')
+        job_offer = JobOffer.objects.create(**validated_data)
+        for job_tag in job_tags_data:
             try:
-                jobTag = JobTag.objects.get(name = jobTag['name'])
-                jobOffer.jobTags.add(jobTag)
+                job_tag = JobTag.objects.get(name = job_tag['name'])
+                job_offer.jobTags.add(job_tag)
             except JobTag.DoesNotExist:
                 raise serializers.ValidationError({"detail": "Tag with given name doesn't exist"})
-        return jobOffer
+        return job_offer
 
 
 class FavoriteJobOfferSerializer(serializers.ModelSerializer):
     job_offers = serializers.PrimaryKeyRelatedField(many = True, queryset = JobOffer.objects.all())
-
+    user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = FavoriteJobOffer
         fields = ['fav_job_offer_id', 'user_id', 'job_offers']
@@ -110,8 +90,9 @@ class FavoriteJobOfferSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"detail": "Job offer with given id doesn't exist"})
         return favorite_job_offer
 
-
 class CVSerializer(serializers.ModelSerializer):
+    user_id = serializers.HiddenField(default = serializers.CurrentUserDefault())
     class Meta:
         model = CV
-        fields = '__all__'
+        fields = ['cv_id', 'user_id', 'file']
+

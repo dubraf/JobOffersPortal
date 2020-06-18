@@ -37,6 +37,7 @@ class EmployerProfile(models.Model):
 
 class JobTag(models.Model):
     tag_id = models.AutoField(primary_key = True)
+    user_id = models.ForeignKey(User, on_delete = models.PROTECT)
     name = models.CharField(max_length = 45, blank = False)
 
 class JobOffer(models.Model):
