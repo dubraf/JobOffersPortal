@@ -23,7 +23,7 @@ class User(AbstractUser):
 class CV(models.Model):
     cv_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
-    file = models.FileField()
+    file = models.FileField(upload_to='message/%Y/%m/%d/')
 
 class EmployerProfile(models.Model):
     profile_id = models.AutoField(primary_key = True)

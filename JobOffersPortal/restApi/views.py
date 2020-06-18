@@ -1,19 +1,22 @@
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 from rest_framework.response import Response
 from rest_auth.registration.views import RegisterView
 from rest_framework import viewsets, mixins
 from django.shortcuts import get_object_or_404
 
-from .serializers import JobOfferSerializer, JobTagsSerializer, EmployerProfileSerializer, FavoriteJobOfferSerializer
-from .models import User, JobOffer, JobTag, EmployerProfile, FavoriteJobOffer
-from .permissions import IsEmployer, IsOwner, IsStandardUser
+from .serializers import JobOfferSerializer, JobTagsSerializer, EmployerProfileSerializer, FavoriteJobOfferSerializer, \
+    CVSerializer
+from .models import User, JobOffer, JobTag, EmployerProfile, FavoriteJobOffer, CV
+from .permissions import IsEmployer, IsOwner, IsStandardUser, IsOwner
+
 
 class CustomRegisterView(RegisterView):
     queryset = User.objects.all()
 
 class JobOffersViewSet(viewsets.ViewSet):
     serializer_class = JobOfferSerializer
-    permission_classes = [IsEmployer&IsOwner]
+    permission_classes = [IsEmployer & IsOwner]
 
     def list(self, request):
         jobs = JobOffer.objects.all()
@@ -131,3 +134,17 @@ class FavoriteJobOffersViewSet(mixins.CreateModelMixin,
     queryset = FavoriteJobOffer.objects.all()
     serializer_class = FavoriteJobOfferSerializer
     permission_classes = [IsStandardUser, IsOwner]
+
+class CVViewSet(mixins.CreateModelMixin,
+                mixins.ListModelMixin,
+                mixins.RetrieveModelMixin,
+                mixins.DestroyModelMixin,
+                viewsets.GenericViewSet):
+    queryset = CV.objects.all()
+    parser_classes = (MultiPartParser,)
+    serializer_class = CVSerializer
+    permission_classes = [IsStandardUser, IsOwner]
+
+    def get_queryset(self):
+        user_cvs = CV.objects.filter(user_id = self.request.user.user_id)
+        return user_cvs
