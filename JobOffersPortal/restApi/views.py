@@ -18,10 +18,18 @@ class JobOffersViewSet(mixins.ListModelMixin,
     queryset = JobOffer.objects.all()
     serializer_class = JobOfferSerializer
     permission_classes = [IsEmployer & IsOwner]
+    filter_fields = ['offerName']
 
     def get_serializer_context(self):
         context = super(JobOffersViewSet, self).get_serializer_context()
         return context
+
+    def get_queryset(self):
+        queryset = JobOffer.objects.all()
+        job_offer = self.request.query_params.get('offerName', None)
+        if job_offer is not None:
+            queryset = queryset.filter(purchaser__username = job_offer)
+        return queryset
 
 class JobTagsViewSet(mixins.ListModelMixin,
                      mixins.CreateModelMixin,
