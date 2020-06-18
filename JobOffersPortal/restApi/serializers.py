@@ -93,6 +93,11 @@ class FavoriteJobOfferSerializer(serializers.ModelSerializer):
         fields = ['fav_job_offer_id', 'user_id', 'job_offers']
 
     def create(self, validated_data):
+        user_id = validated_data.get('user_id')
+        if user_id.email != self.context['request'].user.email:
+            raise serializers.ValidationError({"detail": "You can add favorite offers only to your account"})
+        if user_id == FavoriteJobOffer.objects.filter(user_id = user_id):
+            raise serializers.ValidationError({"detail": "Please update your existing favorite offers instead of creating new one"})
         job_offers_data = validated_data.pop('job_offers')
         favorite_job_offer = FavoriteJobOffer.objects.create(**validated_data)
         for job_offer_id in job_offers_data:
@@ -100,5 +105,5 @@ class FavoriteJobOfferSerializer(serializers.ModelSerializer):
                 job_offer = JobOffer.objects.get(job_offer_id = job_offer_id.pk)
                 favorite_job_offer.job_offers.add(job_offer)
             except JobOffer.DoesNotExist:
-                raise serializers.ValidationError({"detail": "Tag with given name doesn't exist"})
+                raise serializers.ValidationError({"detail": "Job offer with given id doesn't exist"})
         return favorite_job_offer
