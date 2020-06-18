@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from restApi.models import User, JobTag, JobOffer, EmployerProfile
+from restApi.models import User, JobTag, JobOffer, EmployerProfile, FavoriteJobOffer
 from rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.adapter import DefaultAccountAdapter
 
@@ -68,7 +68,42 @@ class EmployerProfileSerializer(serializers.ModelSerializer):
 
 
 class JobOfferSerializer(serializers.ModelSerializer):
-    jobTags = JobTagsSerializer(many = True, read_only = True)
+    jobTags = JobTagsSerializer(many = True)
     class Meta:
         model = JobOffer
-        fields = ['employer_profile_id', 'job_adv_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']
+        fields = ['employer_profile_id', 'job_offer_id', 'user_id', 'jobTags', 'name', 'description', 'expiration_date', 'salary']
+
+    def create(self, validated_data):
+        jobTagsData = validated_data.pop('jobTags')
+        jobOffer = JobOffer.objects.create(**validated_data)
+        for jobTag in jobTagsData:
+            try:
+                jobTag = JobTag.objects.get(name = jobTag['name'])
+                jobOffer.jobTags.add(jobTag)
+            except JobTag.DoesNotExist:
+                raise serializers.ValidationError({"detail": "Tag with given name doesn't exist"})
+        return jobOffer
+
+
+class FavoriteJobOfferSerializer(serializers.ModelSerializer):
+    job_offers = serializers.PrimaryKeyRelatedField(many = True, queryset = JobOffer.objects.all())
+
+    class Meta:
+        model = FavoriteJobOffer
+        fields = ['fav_job_offer_id', 'user_id', 'job_offers']
+
+    def create(self, validated_data):
+        user_id = validated_data.get('user_id')
+        if user_id.email != self.context['request'].user.email:
+            raise serializers.ValidationError({"detail": "You can add favorite offers only to your account"})
+        if user_id == FavoriteJobOffer.objects.filter(user_id = user_id):
+            raise serializers.ValidationError({"detail": "Please update your existing favorite offers instead of creating new one"})
+        job_offers_data = validated_data.pop('job_offers')
+        favorite_job_offer = FavoriteJobOffer.objects.create(**validated_data)
+        for job_offer_id in job_offers_data:
+            try:
+                job_offer = JobOffer.objects.get(job_offer_id = job_offer_id.pk)
+                favorite_job_offer.job_offers.add(job_offer)
+            except JobOffer.DoesNotExist:
+                raise serializers.ValidationError({"detail": "Job offer with given id doesn't exist"})
+        return favorite_job_offer

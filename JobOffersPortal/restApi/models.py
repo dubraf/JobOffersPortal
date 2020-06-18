@@ -35,21 +35,24 @@ class EmployerProfile(models.Model):
     address = models.CharField(max_length = 125, blank = False, default = '')
     website = models.URLField(blank = True)
 
+class JobTag(models.Model):
+    tag_id = models.AutoField(primary_key = True)
+    name = models.CharField(max_length = 45, blank = False)
+
 class JobOffer(models.Model):
-    job_adv_id = models.AutoField(primary_key = True)
+    job_offer_id = models.AutoField(primary_key = True)
     user_id = models.ForeignKey(User, on_delete = models.PROTECT)
     employer_profile_id = models.ForeignKey(EmployerProfile, on_delete = models.PROTECT, null = True, blank = True)
     name = models.CharField(max_length = 45, blank = False)
     description = models.CharField(max_length = 2000, blank = True, default = '')
     expiration_date = models.DateTimeField('expiration date')
     salary = models.FloatField(blank = False)
-
-class JobTag(models.Model):
-    tag_id = models.AutoField(primary_key = True)
-    jobOffer = models.ForeignKey(JobOffer, on_delete = models.PROTECT, related_name = 'jobTags', null = True)
-    name = models.CharField(max_length = 45, blank = False)
+    jobTags = models.ManyToManyField(JobTag)
 
 class Image(models.Model):
     image_id = models.AutoField(primary_key = True)
 
-
+class FavoriteJobOffer(models.Model):
+    fav_job_offer_id = models.AutoField(primary_key = True)
+    user_id = models.ForeignKey(User, on_delete = models.PROTECT)
+    job_offers = models.ManyToManyField(JobOffer)

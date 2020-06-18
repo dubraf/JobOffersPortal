@@ -19,6 +19,15 @@ class IsOwner(permissions.BasePermission):
     message = 'Only owner can modify this content'
 
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS or request.method == 'POST':
+        if request.method in permissions.SAFE_METHODS:
             return True
         return request.user.email == obj.user_id.email
+
+class IsStandardUser(permissions.BasePermission):
+    message = 'Only standard user can have favorite job offer'
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and not request.user.isEmployer
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and not request.user.isEmployer

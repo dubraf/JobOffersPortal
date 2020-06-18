@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'jobOffers', views.JobOffersViewSet, basename = 'JobOffers')
 router.register(r'jobTags', views.JobTagsViewSet, basename = 'JobTags')
 router.register(r'employerProfile', views.EmployerProfileViewSet, basename = 'EmployerProfile')
+router.register(r'favOffers/favorite', views.FavoriteJobOffersViewSet, basename = 'FavoriteOffers')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
