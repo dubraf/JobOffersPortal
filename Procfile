@@ -1,2 +1,1 @@
-web: gunicorn JobOffersPortal.wsgi
-web: gunicorn JobOffersPortal:app
+web: gunicorn JobOffersPortal.wsgi --log-file -
