@@ -47,8 +47,13 @@ INSTALLED_APPS = [
     'rest_auth',
 ]
 ALLOWED_HOSTS = ['.herokuapp.com']
+
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
 AUTH_USER_MODEL = 'restApi.User'
