@@ -1,2 +1,2 @@
-web: gunicorn gettingstarted.wsgi
-web: gunicorn app:app
+web: gunicorn JobOffersPortal.wsgi
+web: gunicorn JobOffersPortal:app
