@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_auth',
 ]
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
 AUTH_USER_MODEL = 'restApi.User'
