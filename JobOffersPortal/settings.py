@@ -47,11 +47,14 @@ INSTALLED_APPS = [
     'rest_auth',
 ]
 ALLOWED_HOSTS = ['*']
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
 )
+STATICFILES_DIRS = (
+     os.path.join(BASE_DIR, 'static'),
+)
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
 AUTH_USER_MODEL = 'restApi.User'
