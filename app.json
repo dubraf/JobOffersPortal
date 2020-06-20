@@ -1,0 +1,24 @@
+{
+  "name": "JobOffersPortal",
+  "scripts": {
+      "postdeploy": "python manage.py migrate && python manage.py collectstatic"
+  },
+  "env": {
+    "ENVIRONMENT": "debug",
+    "SECRET_KEY": {
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}
